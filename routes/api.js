@@ -16,8 +16,13 @@ module.exports = function (app) {
   app.route('/api/issues/:project')
   
     .get(function (req, res){
-      var project = req.params.project;
-      
+      var { project } = req.params;
+      var { open } = req.query;
+      const query = open ? { project: project, open: open } : { project: project };
+      Issue.find(query, (err, issues) => {
+        if(err) return res.status(400).send(err.message);
+        return res.json(issues);
+      })
     })
     
     .post(function (req, res){
