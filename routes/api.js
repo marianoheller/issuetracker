@@ -35,6 +35,7 @@ module.exports = function (app) {
       });
       issue.save( (err) => {
         if(err) return res.status(400).send(err.message);
+        console.log("SAVED", issue);
         res.json(issue);
       })
     })

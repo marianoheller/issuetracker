@@ -12,9 +12,15 @@ var issueSchema = new Schema({
   assigned_to: { type: String },
   status_text: { type: String },
 
-  created_on: { type: Date, required: true, default: Date.now() },
-  updated_on: { type: Date, required: true, default: Date.now() },
+  created_on: { type: Date, required: true, default: new Date() },
+  updated_on: { type: Date, required: true, default: new Date() },
   open: { type: Boolean, required: true, default: false },
+});
+
+
+issueSchema.pre('update', function(next) {
+    this.updated_on = new Date();
+    next();
 });
 
 
