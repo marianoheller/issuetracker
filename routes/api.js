@@ -22,12 +22,12 @@ module.exports = function (app) {
     
     .post(function (req, res){
       var project = req.params.project;
-      const { issue_text, issue_name, created_by } = req.body;
+      const { issue_text, issue_title, created_by } = req.body;
       const { assigned_to, status_text } = req.body;
-      if( !issue_text || !issue_name || !created_by ) return res.status(400).send("Not enough parameters");
-
+      if( !issue_text || !issue_title || !created_by ) return res.status(400).send("Not enough parameters");
       var issue = new Issue({
-        issue_name: issue_name,
+        project: project,
+        issue_title: issue_title,
         issue_text: issue_text,
         created_by: created_by,
         assigned_to: assigned_to || "",
@@ -35,17 +35,26 @@ module.exports = function (app) {
       });
       issue.save( (err) => {
         if(err) return res.status(400).send(err.message);
-        console.log("SAVED", issue);
         res.json(issue);
       })
     })
     
     .put(function (req, res){
       var project = req.params.project;
-      const { _id, issue_name, issue_text, created_by, assigned_to, status_text } = req.body;
+      const { _id, issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
       if (!_id) return res.status(400).send("could not update "+ _id);
-      Issue.findByIdAndUpdate(_id, {
-
+      if( !issue_title && !issue_text && !created_by && !assigned_to && !status_text ) return res.status(200).send('no updated field sent');
+      Issue.findById(_id, (err, issue) => {
+        if(err) return res.status(400).send("could not update "+ _id);
+        if( issue_title ) issue.issue_title = issue_title;
+        if( issue_text ) issue.issue_text = issue_text;
+        if( created_by ) issue.created_by = created_by;
+        if( assigned_to ) issue.assigned_to = assigned_to;
+        if( status_text ) issue.status_text = status_text;
+        issue.save( (error) => {
+          if(error) return res.status(400).send("could not update "+ _id);
+          return res.status(200).send("successfully updated");
+        });
       })
     })
     
