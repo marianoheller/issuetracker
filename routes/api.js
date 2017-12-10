@@ -66,7 +66,7 @@ module.exports = function (app) {
       var project = req.params.project;
       const { _id } = req.body;
       if (!_id) return res.status(400).send( '_id error');
-      Issue.findByIdAndRemove(_id, (err, res) => {
+      Issue.findByIdAndRemove(_id, (err) => {
         if(err) return res.status(400).send("could not delete "+ _id);
         res.status(200).send( 'deleted '+_id);
       })

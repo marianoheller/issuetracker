@@ -92,11 +92,53 @@ suite('Functional Tests', function() {
       });
       
       test('One field to update', function(done) {
-        
+        chai.request(server)
+        .post('/api/issues/test')
+        .send( {
+          issue_title: 'Title',
+          issue_text: 'text',
+          created_by: 'Functional Test - Every field filled in'
+        } )
+        .end(function(err, res){
+          const data = JSON.parse(res.text);
+          const idSaved = data._id;
+          chai.request(server)
+          .put('/api/issues/test')
+          .send({ _id: idSaved, issue_title: "newTitle" })
+          .end(function(err, res){
+            assert.equal(res.status, 200);
+            assert.equal(res.text, "successfully updated");
+            done();
+          });
+        });
       });
       
       test('Multiple fields to update', function(done) {
-        
+        this.timeout(5000);
+        chai.request(server)
+        .post('/api/issues/test')
+        .send( {
+          issue_title: 'Title',
+          issue_text: 'text',
+          created_by: 'Functional Test - Every field filled in'
+        } )
+        .end(function(err, res){
+          const data = JSON.parse(res.text);
+          const idSaved = data._id;
+          chai.request(server)
+          .put('/api/issues/test')
+          .send({ 
+            _id: idSaved, 
+            issue_title: "newTitle",
+            issue_text: "newText",
+            created_by: "newCreator"
+          })
+          .end(function(err, res){
+            assert.equal(res.status, 200);
+            assert.equal(res.text, "successfully updated");
+            done();
+          });
+        });
       });
       
     });
@@ -127,7 +169,7 @@ suite('Functional Tests', function() {
         chai.request(server)
         .get('/api/issues/test')
         .query({
-          open: true
+          open: false
         })
         .end(function(err, res){
           assert.equal(res.status, 200);
@@ -146,6 +188,36 @@ suite('Functional Tests', function() {
       });
       
       test('Multiple filters (test for multiple fields you know will be in the db for a return)', function(done) {
+        const params = {
+          issue_title: String(Math.random()),
+          issue_text: String(Math.random()),
+          created_by: String(Math.random())
+        };
+        chai.request(server)
+        .post('/api/issues/test')
+        .send( params )
+        .end(function(err, res){
+          chai.request(server)
+          .get('/api/issues/test')
+          .query({
+            open: false,
+            issue_title: 'Title'
+          })
+          .end(function(err, res){
+            assert.equal(res.status, 200);
+            assert.isArray(res.body);
+            assert.property(res.body[0], 'issue_title');
+            assert.property(res.body[0], 'issue_text');
+            assert.property(res.body[0], 'created_on');
+            assert.property(res.body[0], 'updated_on');
+            assert.property(res.body[0], 'created_by');
+            assert.property(res.body[0], 'assigned_to');
+            assert.property(res.body[0], 'open');
+            assert.property(res.body[0], 'status_text');
+            assert.property(res.body[0], '_id');
+            done();
+          });
+        })
         
       });
       
@@ -178,7 +250,7 @@ suite('Functional Tests', function() {
           chai.request(server)
           .del('/api/issues/test')
           .send({ _id: idSaved })
-          .end(function(err, res){
+          .end(function(err, res) {
             assert.equal(res.status, 200);
             assert.equal(res.text, 'deleted '+ idSaved);
             done();
