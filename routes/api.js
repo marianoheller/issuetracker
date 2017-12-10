@@ -16,10 +16,9 @@ module.exports = function (app) {
   app.route('/api/issues/:project')
   
     .get(function (req, res){
-      var { project } = req.params;
-      var { open } = req.query;
-      const query = open ? { project: project, open: open } : { project: project };
-      Issue.find(query, (err, issues) => {
+      const { project } = req.params;
+      //Not secure. The right way would be to pick the params that I need.
+      Issue.find(req.query, (err, issues) => {
         if(err) return res.status(400).send(err.message);
         return res.json(issues);
       })
