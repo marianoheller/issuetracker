@@ -29,7 +29,7 @@ module.exports = function (app) {
       var project = req.params.project;
       const { issue_text, issue_title, created_by } = req.body;
       const { assigned_to, status_text } = req.body;
-      if( !issue_text || !issue_title || !created_by ) return res.status(400).send("Not enough parameters");
+      if( !issue_text || !issue_title || !created_by ) return res.status(400).send("need required parameters");
       var issue = new Issue({
         project: project,
         issue_title: issue_title,
@@ -47,8 +47,8 @@ module.exports = function (app) {
     .put(function (req, res){
       var project = req.params.project;
       const { _id, issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
-      if (!_id) return res.status(400).send("could not update "+ _id);
       if( !issue_title && !issue_text && !created_by && !assigned_to && !status_text ) return res.status(200).send('no updated field sent');
+      if (!_id) return res.status(400).send("could not update "+ _id);
       Issue.findById(_id, (err, issue) => {
         if(err) return res.status(400).send("could not update "+ _id);
         if( issue_title ) issue.issue_title = issue_title;
