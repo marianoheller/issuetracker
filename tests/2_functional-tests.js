@@ -154,10 +154,36 @@ suite('Functional Tests', function() {
     suite('DELETE /api/issues/{project} => text', function() {
       
       test('No _id', function(done) {
-        
+        chai.request(server)
+        .del('/api/issues/test')
+        .send({})
+        .end(function(err, res){
+          assert.equal(res.status, 400);
+          assert.equal(res.text, '_id error');
+          done();
+        });
       });
       
       test('Valid _id', function(done) {
+        chai.request(server)
+        .post('/api/issues/test')
+        .send( {
+          issue_title: 'Title',
+          issue_text: 'text',
+          created_by: 'Functional Test - Every field filled in'
+        } )
+        .end(function(err, res){
+          const data = JSON.parse(res.text);
+          const idSaved = data._id;
+          chai.request(server)
+          .del('/api/issues/test')
+          .send({ _id: idSaved })
+          .end(function(err, res){
+            assert.equal(res.status, 200);
+            assert.equal(res.text, 'deleted '+ idSaved);
+            done();
+          });
+        });
         
       });
       
