@@ -14,6 +14,7 @@ var server = require('../server');
 chai.use(chaiHttp);
 
 suite('Functional Tests', function() {
+  this.timeout(5000);
   
     suite('POST /api/issues/{project} => object with issue data', function() {
       
@@ -97,7 +98,7 @@ suite('Functional Tests', function() {
         .send( {
           issue_title: 'Title',
           issue_text: 'text',
-          created_by: 'Functional Test - Every field filled in'
+          created_by: 'Functional Test - Every field filled in',
         } )
         .end(function(err, res){
           const data = JSON.parse(res.text);
@@ -180,7 +181,7 @@ suite('Functional Tests', function() {
           assert.property(res.body[0], 'updated_on');
           assert.property(res.body[0], 'created_by');
           assert.property(res.body[0], 'assigned_to');
-          assert.property(res.body[0], 'open');
+          assert(res.body[0].open == false, 'open');
           assert.property(res.body[0], 'status_text');
           assert.property(res.body[0], '_id');
           done();
@@ -206,13 +207,13 @@ suite('Functional Tests', function() {
           .end(function(err, res){
             assert.equal(res.status, 200);
             assert.isArray(res.body);
-            assert.property(res.body[0], 'issue_title');
+            assert(res.body[0].issue_title === 'Title', 'title');
             assert.property(res.body[0], 'issue_text');
             assert.property(res.body[0], 'created_on');
             assert.property(res.body[0], 'updated_on');
             assert.property(res.body[0], 'created_by');
             assert.property(res.body[0], 'assigned_to');
-            assert.property(res.body[0], 'open');
+            assert(!res.body[0].open, 'open');
             assert.property(res.body[0], 'status_text');
             assert.property(res.body[0], '_id');
             done();

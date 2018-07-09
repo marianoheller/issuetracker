@@ -19,8 +19,8 @@ var issueSchema = new Schema({
 });
 
 
-issueSchema.pre('update', function(next) {
-  this.updated_on = new Date();
+issueSchema.pre('findOneAndUpdate', function(next) {
+  this.update({},{ $set: { updated_on: new Date() } });
   next();
 });
 
@@ -36,7 +36,7 @@ issueSchema.post('save', function(doc) {
   console.log('%s has been saved', doc._id);
 });
 
-issueSchema.post('update', function(doc) {
+issueSchema.post('findOneAndUpdate', function(doc) {
   console.log('%s has been updated', doc._id);
 });
 
